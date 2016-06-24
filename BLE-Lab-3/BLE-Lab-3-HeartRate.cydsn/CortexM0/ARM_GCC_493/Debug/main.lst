@@ -1,0 +1,1226 @@
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.InitializeSystem,"ax",%progbits
+  18              		.align	2
+  19              		.code	16
+  20              		.thumb_func
+  21              		.type	InitializeSystem, %function
+  22              	InitializeSystem:
+  23              	.LFB35:
+  24              		.file 1 ".\\main.c"
+   1:.\main.c      **** /*****************************************************************************
+   2:.\main.c      **** * File Name: main.c
+   3:.\main.c      **** *
+   4:.\main.c      **** * Version: 1.0
+   5:.\main.c      **** *
+   6:.\main.c      **** * Description:
+   7:.\main.c      **** * This is the top level file for the PSoC 4 BLE Lab 3.
+   8:.\main.c      **** *
+   9:.\main.c      **** * Hardware Dependency:
+  10:.\main.c      **** * CY8CKIT-042 BLE Pioneer Kit
+  11:.\main.c      **** *
+  12:.\main.c      **** ******************************************************************************
+  13:.\main.c      **** * Copyright (2014), Cypress Semiconductor Corporation.
+  14:.\main.c      **** ******************************************************************************
+  15:.\main.c      **** * This software is owned by Cypress Semiconductor Corporation (Cypress) and is
+  16:.\main.c      **** * protected by and subject to worldwide patent protection (United States and
+  17:.\main.c      **** * foreign), United States copyright laws and international treaty provisions.
+  18:.\main.c      **** * Cypress hereby grants to licensee a personal, non-exclusive, non-transferable
+  19:.\main.c      **** * license to copy, use, modify, create derivative works of, and compile the
+  20:.\main.c      **** * Cypress Source Code and derivative works for the sole purpose of creating
+  21:.\main.c      **** * custom software in support of licensee product to be used only in conjunction
+  22:.\main.c      **** * with a Cypress integrated circuit as specified in the applicable agreement.
+  23:.\main.c      **** * Any reproduction, modification, translation, compilation, or representation of
+  24:.\main.c      **** * this software except as specified above is prohibited without the express
+  25:.\main.c      **** * written permission of Cypress.
+  26:.\main.c      **** *
+  27:.\main.c      **** * Disclaimer: CYPRESS MAKES NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, WITH
+  28:.\main.c      **** * REGARD TO THIS MATERIAL, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  29:.\main.c      **** * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+  30:.\main.c      **** * Cypress reserves the right to make changes without further notice to the
+  31:.\main.c      **** * materials described herein. Cypress does not assume any liability arising out
+  32:.\main.c      **** * of the application or use of any product or circuit described herein. Cypress
+  33:.\main.c      **** * does not authorize its products for use as critical components in life-support
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 2
+
+
+  34:.\main.c      **** * systems where a malfunction or failure may reasonably be expected to result in
+  35:.\main.c      **** * significant injury to the user. The inclusion of Cypress' product in a life-
+  36:.\main.c      **** * support systems application implies that the manufacturer assumes all risk of
+  37:.\main.c      **** * such use and in doing so indemnifies Cypress against all charges. Use may be
+  38:.\main.c      **** * limited by and subject to the applicable Cypress software license agreement.
+  39:.\main.c      **** *****************************************************************************/
+  40:.\main.c      **** 
+  41:.\main.c      **** 
+  42:.\main.c      **** /*****************************************************************************
+  43:.\main.c      **** * Included headers
+  44:.\main.c      **** *****************************************************************************/
+  45:.\main.c      **** #include <project.h>
+  46:.\main.c      **** #include <stdbool.h>
+  47:.\main.c      **** #include "main.h"
+  48:.\main.c      **** #include "HeartRateProcessing.h"
+  49:.\main.c      **** #include "BleProcessing.h"
+  50:.\main.c      **** #include "WatchdogTimer.h"
+  51:.\main.c      **** 
+  52:.\main.c      **** 
+  53:.\main.c      **** /*****************************************************************************
+  54:.\main.c      **** * Macros
+  55:.\main.c      **** *****************************************************************************/
+  56:.\main.c      **** #if CONNECTION_PARAM_UPDATE
+  57:.\main.c      **** #define TIME_SINCE_CONNECTED_MS         (5000)
+  58:.\main.c      **** #endif
+  59:.\main.c      **** 
+  60:.\main.c      **** /*****************************************************************************
+  61:.\main.c      **** * Global variables
+  62:.\main.c      **** *****************************************************************************/
+  63:.\main.c      **** #if CONNECTION_PARAM_UPDATE
+  64:.\main.c      **** static CYBLE_GAP_CONN_UPDATE_PARAM_T hrmConnectionParam =
+  65:.\main.c      **** {
+  66:.\main.c      ****     16,         /* Minimum connection interval of 20 ms */
+  67:.\main.c      ****     16,         /* Maximum connection interval of 20 ms */
+  68:.\main.c      ****     49,         /* Slave latency of 49 */
+  69:.\main.c      ****     500         /* Supervision timeout of 5 seconds */
+  70:.\main.c      **** };
+  71:.\main.c      **** #endif
+  72:.\main.c      **** 
+  73:.\main.c      **** 
+  74:.\main.c      **** /*****************************************************************************
+  75:.\main.c      **** * Static function definitions
+  76:.\main.c      **** *****************************************************************************/
+  77:.\main.c      **** 
+  78:.\main.c      **** /*****************************************************************************
+  79:.\main.c      **** * Function Name: InitializeSystem
+  80:.\main.c      **** ******************************************************************************
+  81:.\main.c      **** * Summary:
+  82:.\main.c      **** * Initializes all the blocks of the system.
+  83:.\main.c      **** *
+  84:.\main.c      **** * Parameters:
+  85:.\main.c      **** * None
+  86:.\main.c      **** *
+  87:.\main.c      **** * Return:
+  88:.\main.c      **** * None
+  89:.\main.c      **** *
+  90:.\main.c      **** * Theory:
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 3
+
+
+  91:.\main.c      **** * The function enables the Opamp and ADC for the heart rate measurement, and 
+  92:.\main.c      **** * setups the BLE component. It also starts the watchdog timer and ensures that 
+  93:.\main.c      **** * all the status LEDs are off at system startup. 
+  94:.\main.c      **** *
+  95:.\main.c      **** * Side Effects:
+  96:.\main.c      **** * None
+  97:.\main.c      **** *
+  98:.\main.c      **** *****************************************************************************/
+  99:.\main.c      **** static void InitializeSystem(void)
+ 100:.\main.c      **** {
+  25              		.loc 1 100 0
+  26              		.cfi_startproc
+  27 0000 80B5     		push	{r7, lr}
+  28              		.cfi_def_cfa_offset 8
+  29              		.cfi_offset 7, -8
+  30              		.cfi_offset 14, -4
+  31 0002 00AF     		add	r7, sp, #0
+  32              		.cfi_def_cfa_register 7
+ 101:.\main.c      ****     #if (RGB_LED_IN_PROJECT)
+ 102:.\main.c      ****         /* Turn off all LEDs */
+ 103:.\main.c      ****         Led_Advertising_Green_Write(1); // Led_Advertising_Green_Write(1) is the name of LED in API
+  33              		.loc 1 103 0
+  34 0004 0120     		mov	r0, #1
+  35 0006 FFF7FEFF 		bl	Led_Advertising_Green_Write
+ 104:.\main.c      ****         Led_Connected_Blue_Write(1);  // Led_Connected_Blue is the name of LED in API
+  36              		.loc 1 104 0
+  37 000a 0120     		mov	r0, #1
+  38 000c FFF7FEFF 		bl	Led_Connected_Blue_Write
+ 105:.\main.c      ****     #endif  /* #if (RGB_LED_IN_PROJECT) */
+ 106:.\main.c      **** 
+ 107:.\main.c      ****     /* Enabling Global interrupts */
+ 108:.\main.c      ****     CyGlobalIntEnable; 
+  39              		.loc 1 108 0
+  40              	@ 108 ".\main.c" 1
+  41 0010 62B6     		CPSIE   i
+  42              	@ 0 "" 2
+ 109:.\main.c      **** 	
+ 110:.\main.c      ****     /* Start Opamp and ADC components */
+ 111:.\main.c      **** 	Opamp_Start();
+  43              		.loc 1 111 0
+  44              		.code	16
+  45 0012 FFF7FEFF 		bl	Opamp_Start
+ 112:.\main.c      ****     ADC_Start();
+  46              		.loc 1 112 0
+  47 0016 FFF7FEFF 		bl	ADC_Start
+ 113:.\main.c      **** 	
+ 114:.\main.c      ****     /* Start BLE component */
+ 115:.\main.c      ****     CyBle_Start(GeneralEventHandler);  // Should take care  GeneralEventHandler
+  48              		.loc 1 115 0
+  49 001a 064B     		ldr	r3, .L2
+  50 001c 181C     		mov	r0, r3
+  51 001e FFF7FEFF 		bl	CyBle_Start
+ 116:.\main.c      ****         
+ 117:.\main.c      ****     /* Register the Heart Rate Service event handler callback. The function
+ 118:.\main.c      ****      * to be registered is HrsEventHandler().
+ 119:.\main.c      ****      */
+ 120:.\main.c      **** 	CyBle_HrsRegisterAttrCallback(HrsEventHandler); //Should take care HrsEventHandler
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 4
+
+
+  52              		.loc 1 120 0
+  53 0022 054B     		ldr	r3, .L2+4
+  54 0024 181C     		mov	r0, r3
+  55 0026 FFF7FEFF 		bl	CyBle_HrsRegisterAttrCallback
+ 121:.\main.c      ****     
+ 122:.\main.c      ****     /* Start the Watchdog Timer */
+ 123:.\main.c      **** 	WatchdogTimer_Start();
+  56              		.loc 1 123 0
+  57 002a FFF7FEFF 		bl	WatchdogTimer_Start
+ 124:.\main.c      **** }
+  58              		.loc 1 124 0
+  59 002e BD46     		mov	sp, r7
+  60              		@ sp needed
+  61 0030 80BD     		pop	{r7, pc}
+  62              	.L3:
+  63 0032 C046     		.align	2
+  64              	.L2:
+  65 0034 00000000 		.word	GeneralEventHandler
+  66 0038 00000000 		.word	HrsEventHandler
+  67              		.cfi_endproc
+  68              	.LFE35:
+  69              		.size	InitializeSystem, .-InitializeSystem
+  70              		.section	.text.main,"ax",%progbits
+  71              		.align	2
+  72              		.global	main
+  73              		.code	16
+  74              		.thumb_func
+  75              		.type	main, %function
+  76              	main:
+  77              	.LFB36:
+ 125:.\main.c      **** 
+ 126:.\main.c      **** 
+ 127:.\main.c      **** /*****************************************************************************
+ 128:.\main.c      **** * Public function definitions
+ 129:.\main.c      **** *****************************************************************************/
+ 130:.\main.c      **** 
+ 131:.\main.c      **** /*****************************************************************************
+ 132:.\main.c      **** * Function Name: main
+ 133:.\main.c      **** ******************************************************************************
+ 134:.\main.c      **** * Summary:
+ 135:.\main.c      **** * The main function for the project.
+ 136:.\main.c      **** *
+ 137:.\main.c      **** * Parameters:
+ 138:.\main.c      **** * None
+ 139:.\main.c      **** *
+ 140:.\main.c      **** * Return:
+ 141:.\main.c      **** * None
+ 142:.\main.c      **** *
+ 143:.\main.c      **** * Theory:
+ 144:.\main.c      **** * The main function first calls the initialization function to start the 
+ 145:.\main.c      **** * system, and then enters a loop to run forever. In the main loop, it scans
+ 146:.\main.c      **** * the heart rate first, then sends a notification packet every second to a 
+ 147:.\main.c      **** * BLE connected device. It then enters low power (deep sleep) state, waiting
+ 148:.\main.c      **** * for the periodic wakeup interrupt from watchdog timer.
+ 149:.\main.c      **** * When the device is disconnected or when advertisement timeout happens, 
+ 150:.\main.c      **** * the device enters Hibernate mode, waiting for the SW2 switch press to wakeup.
+ 151:.\main.c      **** *
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 5
+
+
+ 152:.\main.c      **** * Side Effects:
+ 153:.\main.c      **** * None
+ 154:.\main.c      **** *
+ 155:.\main.c      **** *****************************************************************************/
+ 156:.\main.c      **** int main()
+ 157:.\main.c      **** {
+  78              		.loc 1 157 0
+  79              		.cfi_startproc
+  80 0000 90B5     		push	{r4, r7, lr}
+  81              		.cfi_def_cfa_offset 12
+  82              		.cfi_offset 4, -12
+  83              		.cfi_offset 7, -8
+  84              		.cfi_offset 14, -4
+  85 0002 83B0     		sub	sp, sp, #12
+  86              		.cfi_def_cfa_offset 24
+  87 0004 00AF     		add	r7, sp, #0
+  88              		.cfi_def_cfa_register 7
+ 158:.\main.c      ****     static uint32 previousTimestamp = 0;
+ 159:.\main.c      ****     static uint32 currentTimestamp = 0;
+ 160:.\main.c      ****     CYBLE_LP_MODE_T bleMode;
+ 161:.\main.c      ****     uint8 interruptStatus;
+ 162:.\main.c      ****     
+ 163:.\main.c      ****     /* Initialize all blocks of the system */
+ 164:.\main.c      **** 	InitializeSystem();
+  89              		.loc 1 164 0
+  90 0006 FFF7FEFF 		bl	InitializeSystem
+  91              	.L13:
+ 165:.\main.c      ****     
+ 166:.\main.c      ****     /* Run forever */
+ 167:.\main.c      ****     for(;;)
+ 168:.\main.c      ****     {
+ 169:.\main.c      ****         /* Wake up Opamp from low power mode */
+ 170:.\main.c      ****         /* This API has not effect when Opamp is operating in deep sleep mode */
+ 171:.\main.c      ****         Opamp_Wakeup();
+  92              		.loc 1 171 0
+  93 000a FFF7FEFF 		bl	Opamp_Wakeup
+ 172:.\main.c      ****         
+ 173:.\main.c      ****         /* Wake up ADC from low power mode */
+ 174:.\main.c      ****         ADC_Wakeup();
+  94              		.loc 1 174 0
+  95 000e FFF7FEFF 		bl	ADC_Wakeup
+ 175:.\main.c      **** 
+ 176:.\main.c      ****         /* Analog Front End. 
+ 177:.\main.c      ****          * Detects the input signal and measures Heart Rate 
+ 178:.\main.c      ****          */
+ 179:.\main.c      ****         ProcessHeartRateSignal();
+  96              		.loc 1 179 0
+  97 0012 FFF7FEFF 		bl	ProcessHeartRateSignal
+ 180:.\main.c      **** 
+ 181:.\main.c      ****         /* Put ADC in low power mode */
+ 182:.\main.c      ****         ADC_Sleep();
+  98              		.loc 1 182 0
+  99 0016 FFF7FEFF 		bl	ADC_Sleep
+ 183:.\main.c      ****         
+ 184:.\main.c      ****         /* Put Opamp in low power mode */
+ 185:.\main.c      ****         /* This API has not effect when Opamp is operating in deep sleep mode */
+ 186:.\main.c      ****         Opamp_Sleep();
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 6
+
+
+ 100              		.loc 1 186 0
+ 101 001a FFF7FEFF 		bl	Opamp_Sleep
+ 187:.\main.c      ****         
+ 188:.\main.c      ****         /* Measure the current system timestamp from watchdog timer */
+ 189:.\main.c      ****         currentTimestamp = WatchdogTimer_GetTimestamp();        
+ 102              		.loc 1 189 0
+ 103 001e FFF7FEFF 		bl	WatchdogTimer_GetTimestamp
+ 104 0022 021C     		mov	r2, r0
+ 105 0024 2D4B     		ldr	r3, .L14
+ 106 0026 1A60     		str	r2, [r3]
+ 190:.\main.c      ****         
+ 191:.\main.c      ****         #if CONNECTION_PARAM_UPDATE
+ 192:.\main.c      ****         /* Update BLE connection parameters a few seconds after connection */
+ 193:.\main.c      ****         if((CyBle_GetState() == CYBLE_STATE_CONNECTED) && 
+ 194:.\main.c      ****            (connParamRequestState == CONN_PARAM_REQUEST_NOT_SENT))
+ 195:.\main.c      ****         {
+ 196:.\main.c      ****             if((currentTimestamp - timestampWhenConnected) > TIME_SINCE_CONNECTED_MS)
+ 197:.\main.c      ****             {
+ 198:.\main.c      ****                 CyBle_L2capLeConnectionParamUpdateRequest(cyBle_connHandle.bdHandle, &hrmConnection
+ 199:.\main.c      ****                 connParamRequestState = CONN_PARAM_REQUEST_SENT;
+ 200:.\main.c      ****             }
+ 201:.\main.c      ****         }        
+ 202:.\main.c      ****         #endif
+ 203:.\main.c      ****         
+ 204:.\main.c      ****         /* Send Heart Rate notification over BLE every second.
+ 205:.\main.c      ****          * Check if the current timestamp minus previous exceeds 1000 ms.
+ 206:.\main.c      ****          */
+ 207:.\main.c      ****         if((currentTimestamp - previousTimestamp) >= 1000)
+ 107              		.loc 1 207 0
+ 108 0028 2C4B     		ldr	r3, .L14
+ 109 002a 1A68     		ldr	r2, [r3]
+ 110 002c 2C4B     		ldr	r3, .L14+4
+ 111 002e 1B68     		ldr	r3, [r3]
+ 112 0030 D31A     		sub	r3, r2, r3
+ 113 0032 2C4A     		ldr	r2, .L14+8
+ 114 0034 9342     		cmp	r3, r2
+ 115 0036 05D9     		bls	.L5
+ 208:.\main.c      ****         {
+ 209:.\main.c      ****             /* Call API defined in BleProcessing.c to send 
+ 210:.\main.c      ****              * notification over BLE.
+ 211:.\main.c      ****              */
+ 212:.\main.c      ****             SendHeartRateOverBLE();
+ 116              		.loc 1 212 0
+ 117 0038 FFF7FEFF 		bl	SendHeartRateOverBLE
+ 213:.\main.c      ****             
+ 214:.\main.c      ****             /* Update the previous timestamp with the current timestamp. */
+ 215:.\main.c      ****             previousTimestamp = currentTimestamp;
+ 118              		.loc 1 215 0
+ 119 003c 274B     		ldr	r3, .L14
+ 120 003e 1A68     		ldr	r2, [r3]
+ 121 0040 274B     		ldr	r3, .L14+4
+ 122 0042 1A60     		str	r2, [r3]
+ 123              	.L5:
+ 216:.\main.c      ****         }
+ 217:.\main.c      **** 
+ 218:.\main.c      ****         /* Try to stay in low power mode until the next watchdog interrupt */
+ 219:.\main.c      ****         while(WatchdogTimer_GetTimestamp() == currentTimestamp)
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 7
+
+
+ 124              		.loc 1 219 0
+ 125 0044 29E0     		b	.L6
+ 126              	.L11:
+ 220:.\main.c      ****         {
+ 221:.\main.c      ****             /* Process any pending BLE events */
+ 222:.\main.c      ****             CyBle_ProcessEvents();
+ 127              		.loc 1 222 0
+ 128 0046 FFF7FEFF 		bl	CyBle_ProcessEvents
+ 223:.\main.c      ****             
+ 224:.\main.c      ****             /* The idea of low power operation is to first request the BLE 
+ 225:.\main.c      ****              * block go to Deep Sleep, and then check whether it actually
+ 226:.\main.c      ****              * entered Deep Sleep. This is important because the BLE block
+ 227:.\main.c      ****              * runs asynchronous to the rest of the application and thus
+ 228:.\main.c      ****              * could be busy/idle independent of the application state. 
+ 229:.\main.c      ****              * 
+ 230:.\main.c      ****              * Once the BLE block is in Deep Sleep, only then the system   Take care about the sequ
+ 231:.\main.c      ****              * can enter Deep Sleep. This is important to maintain the BLE 
+ 232:.\main.c      ****              * connection alive while being in Deep Sleep.
+ 233:.\main.c      ****              */
+ 234:.\main.c      **** 
+ 235:.\main.c      ****             
+ 236:.\main.c      ****             /* Request the BLE block to enter Deep Sleep */
+ 237:.\main.c      ****             bleMode = CyBle_EnterLPM(CYBLE_BLESS_DEEPSLEEP);
+ 129              		.loc 1 237 0
+ 130 004a FC1D     		add	r4, r7, #7
+ 131 004c 0320     		mov	r0, #3
+ 132 004e FFF7FEFF 		bl	CyBle_EnterLPM
+ 133 0052 031C     		mov	r3, r0
+ 134 0054 2370     		strb	r3, [r4]
+ 238:.\main.c      **** 
+ 239:.\main.c      ****             
+ 240:.\main.c      ****             /* Check if the BLE block entered Deep Sleep and if so, then the 
+ 241:.\main.c      ****              * system can enter Deep Sleep. This is done inside a Critical 
+ 242:.\main.c      ****              * Section (where global interrupts are disabled) to avoid a 
+ 243:.\main.c      ****              * race condition between application main (that wants to go to 
+ 244:.\main.c      ****              * Deep Sleep) and other interrupts (which keep the device from 
+ 245:.\main.c      ****              * going to Deep Sleep). 
+ 246:.\main.c      ****              */
+ 247:.\main.c      ****             interruptStatus = CyEnterCriticalSection();
+ 135              		.loc 1 247 0
+ 136 0056 BC1D     		add	r4, r7, #6
+ 137 0058 FFF7FEFF 		bl	CyEnterCriticalSection
+ 138 005c 031C     		mov	r3, r0
+ 139 005e 2370     		strb	r3, [r4]
+ 248:.\main.c      ****             
+ 249:.\main.c      ****             /* Check if the BLE block entered Deep Sleep */
+ 250:.\main.c      ****             if(CYBLE_BLESS_DEEPSLEEP == bleMode)
+ 140              		.loc 1 250 0
+ 141 0060 FB1D     		add	r3, r7, #7
+ 142 0062 1B78     		ldrb	r3, [r3]
+ 143 0064 032B     		cmp	r3, #3
+ 144 0066 0CD1     		bne	.L7
+ 251:.\main.c      ****             {
+ 252:.\main.c      ****                 /* Check the current state of BLE - System can enter Deep Sleep
+ 253:.\main.c      ****                  * only when the BLE block is starting the ECO (during 
+ 254:.\main.c      ****                  * pre-processing for a new connection event) or when it is 
+ 255:.\main.c      ****                  * idle.
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 8
+
+
+ 256:.\main.c      ****                  */
+ 257:.\main.c      ****                 if((CyBle_GetBleSsState() == CYBLE_BLESS_STATE_ECO_ON) ||
+ 145              		.loc 1 257 0
+ 146 0068 FFF7FEFF 		bl	CyBle_GetBleSsState
+ 147 006c 031E     		sub	r3, r0, #0
+ 148 006e 042B     		cmp	r3, #4
+ 149 0070 04D0     		beq	.L8
+ 258:.\main.c      ****                    (CyBle_GetBleSsState() == CYBLE_BLESS_STATE_DEEPSLEEP))
+ 150              		.loc 1 258 0 discriminator 1
+ 151 0072 FFF7FEFF 		bl	CyBle_GetBleSsState
+ 152 0076 031E     		sub	r3, r0, #0
+ 257:.\main.c      ****                    (CyBle_GetBleSsState() == CYBLE_BLESS_STATE_DEEPSLEEP))
+ 153              		.loc 1 257 0 discriminator 1
+ 154 0078 062B     		cmp	r3, #6
+ 155 007a 09D1     		bne	.L10
+ 156              	.L8:
+ 259:.\main.c      ****                 {
+ 260:.\main.c      ****                     CySysPmDeepSleep();
+ 157              		.loc 1 260 0
+ 158 007c FFF7FEFF 		bl	CySysPmDeepSleep
+ 159 0080 06E0     		b	.L10
+ 160              	.L7:
+ 261:.\main.c      ****                 }
+ 262:.\main.c      ****             }
+ 263:.\main.c      ****             /* The else condition signifies that the BLE block cannot enter 
+ 264:.\main.c      ****              * Deep Sleep and is in Active mode.  
+ 265:.\main.c      ****              */
+ 266:.\main.c      ****             else
+ 267:.\main.c      ****             {
+ 268:.\main.c      ****                 /* At this point, the CPU can enter Sleep, but Deep Sleep is not
+ 269:.\main.c      ****                  * allowed. 
+ 270:.\main.c      ****                  * There is one exception - at a connection event, when the BLE 
+ 271:.\main.c      ****                  * Rx/Tx has just finished, and the post processing for the 
+ 272:.\main.c      ****                  * connection event is ongoing, the CPU cannot go to sleep.
+ 273:.\main.c      ****                  * The CPU should wait in Active mode until the post processing 
+ 274:.\main.c      ****                  * is complete while continuously polling the BLE low power 
+ 275:.\main.c      ****                  * entry. As soon as post processing is complete, the BLE block 
+ 276:.\main.c      ****                  * would enter Deep Sleep (because of the polling) and the 
+ 277:.\main.c      ****                  * system Deep Sleep would then be entered. Deep Sleep is the 
+ 278:.\main.c      ****                  * preferred low power mode since it takes much lesser current.
+ 279:.\main.c      ****                  */
+ 280:.\main.c      ****                 if(CyBle_GetBleSsState() != CYBLE_BLESS_STATE_EVENT_CLOSE)
+ 161              		.loc 1 280 0
+ 162 0082 FFF7FEFF 		bl	CyBle_GetBleSsState
+ 163 0086 031E     		sub	r3, r0, #0
+ 164 0088 022B     		cmp	r3, #2
+ 165 008a 01D0     		beq	.L10
+ 281:.\main.c      ****                 {
+ 282:.\main.c      ****                     CySysPmSleep();
+ 166              		.loc 1 282 0
+ 167 008c FFF7FEFF 		bl	CySysPmSleep
+ 168              	.L10:
+ 283:.\main.c      ****                 }
+ 284:.\main.c      ****             }
+ 285:.\main.c      ****             
+ 286:.\main.c      ****             /* Exit Critical section - Global interrupts are enabled again */
+ 287:.\main.c      ****             CyExitCriticalSection(interruptStatus);
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 9
+
+
+ 169              		.loc 1 287 0
+ 170 0090 BB1D     		add	r3, r7, #6
+ 171 0092 1B78     		ldrb	r3, [r3]
+ 172 0094 181C     		mov	r0, r3
+ 173 0096 FFF7FEFF 		bl	CyExitCriticalSection
+ 174              	.L6:
+ 219:.\main.c      ****         {
+ 175              		.loc 1 219 0
+ 176 009a FFF7FEFF 		bl	WatchdogTimer_GetTimestamp
+ 177 009e 021E     		sub	r2, r0, #0
+ 178 00a0 0E4B     		ldr	r3, .L14
+ 179 00a2 1B68     		ldr	r3, [r3]
+ 180 00a4 9A42     		cmp	r2, r3
+ 181 00a6 CED0     		beq	.L11
+ 288:.\main.c      ****         }
+ 289:.\main.c      **** 
+ 290:.\main.c      ****         /* Hibernate entry point - Hibernate is entered upon a BLE disconnect
+ 291:.\main.c      ****          * event or advertisement timeout. Wakeup happens via SW2 switch press, 
+ 292:.\main.c      ****          * upon which the execution starts from the first line of code. 
+ 293:.\main.c      ****          * The I/O state, RAM and UDBs are retained during Hibernate.
+ 294:.\main.c      ****          */
+ 295:.\main.c      ****         if(enterHibernateFlag)
+ 182              		.loc 1 295 0
+ 183 00a8 0F4B     		ldr	r3, .L14+12
+ 184 00aa 1B78     		ldrb	r3, [r3]
+ 185 00ac 002B     		cmp	r3, #0
+ 186 00ae 13D0     		beq	.L12
+ 296:.\main.c      ****         {
+ 297:.\main.c      ****             /* Stop the BLE component */
+ 298:.\main.c      ****             CyBle_Stop();
+ 187              		.loc 1 298 0
+ 188 00b0 FFF7FEFF 		bl	CyBle_Stop
+ 299:.\main.c      ****             
+ 300:.\main.c      ****             /* Enable the Hibernate wakeup functionality */
+ 301:.\main.c      ****             SW2_Switch_ClearInterrupt();
+ 189              		.loc 1 301 0
+ 190 00b4 FFF7FEFF 		bl	SW2_Switch_ClearInterrupt
+ 302:.\main.c      ****             Wakeup_ISR_Start();
+ 191              		.loc 1 302 0
+ 192 00b8 FFF7FEFF 		bl	Wakeup_ISR_Start
+ 303:.\main.c      ****             
+ 304:.\main.c      ****             #if (RGB_LED_IN_PROJECT)
+ 305:.\main.c      ****                 /* Turn off Green and Blue LEDs to indicate Hibernate */
+ 306:.\main.c      ****                 Led_Advertising_Green_Write(1);
+ 193              		.loc 1 306 0
+ 194 00bc 0120     		mov	r0, #1
+ 195 00be FFF7FEFF 		bl	Led_Advertising_Green_Write
+ 307:.\main.c      ****                 Led_Connected_Blue_Write(1);
+ 196              		.loc 1 307 0
+ 197 00c2 0120     		mov	r0, #1
+ 198 00c4 FFF7FEFF 		bl	Led_Connected_Blue_Write
+ 308:.\main.c      ****                 
+ 309:.\main.c      ****                 /* Change the GPIO state to High-Z */
+ 310:.\main.c      ****                 Led_Advertising_Green_SetDriveMode(Led_Advertising_Green_DM_ALG_HIZ);
+ 199              		.loc 1 310 0
+ 200 00c8 0020     		mov	r0, #0
+ 201 00ca FFF7FEFF 		bl	Led_Advertising_Green_SetDriveMode
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 10
+
+
+ 311:.\main.c      ****                 Led_Connected_Blue_SetDriveMode(Led_Connected_Blue_DM_ALG_HIZ);
+ 202              		.loc 1 311 0
+ 203 00ce 0020     		mov	r0, #0
+ 204 00d0 FFF7FEFF 		bl	Led_Connected_Blue_SetDriveMode
+ 312:.\main.c      ****             #endif  /* #if (RGB_LED_IN_PROJECT) */
+ 313:.\main.c      ****             
+ 314:.\main.c      ****             /* Enter hibernate mode */
+ 315:.\main.c      ****             CySysPmHibernate();
+ 205              		.loc 1 315 0
+ 206 00d4 FFF7FEFF 		bl	CySysPmHibernate
+ 207              	.L12:
+ 316:.\main.c      ****         }
+ 317:.\main.c      ****     }
+ 208              		.loc 1 317 0
+ 209 00d8 97E7     		b	.L13
+ 210              	.L15:
+ 211 00da C046     		.align	2
+ 212              	.L14:
+ 213 00dc 00000000 		.word	currentTimestamp.6595
+ 214 00e0 04000000 		.word	previousTimestamp.6594
+ 215 00e4 E7030000 		.word	999
+ 216 00e8 00000000 		.word	enterHibernateFlag
+ 217              		.cfi_endproc
+ 218              	.LFE36:
+ 219              		.size	main, .-main
+ 220              		.bss
+ 221              		.align	2
+ 222              	currentTimestamp.6595:
+ 223 0000 00000000 		.space	4
+ 224              		.align	2
+ 225              	previousTimestamp.6594:
+ 226 0004 00000000 		.space	4
+ 227              		.text
+ 228              	.Letext0:
+ 229              		.file 2 "Generated_Source\\PSoC4/cytypes.h"
+ 230              		.file 3 "Generated_Source\\PSoC4/BLE_Stack.h"
+ 231              		.file 4 ".\\BleProcessing.h"
+ 232              		.section	.debug_info,"",%progbits
+ 233              	.Ldebug_info0:
+ 234 0000 85010000 		.4byte	0x185
+ 235 0004 0400     		.2byte	0x4
+ 236 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 237 000a 04       		.byte	0x4
+ 238 000b 01       		.uleb128 0x1
+ 239 000c 6C010000 		.4byte	.LASF34
+ 240 0010 01       		.byte	0x1
+ 241 0011 A5000000 		.4byte	.LASF35
+ 242 0015 14010000 		.4byte	.LASF36
+ 243 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 244 001d 00000000 		.4byte	0
+ 245 0021 00000000 		.4byte	.Ldebug_line0
+ 246 0025 02       		.uleb128 0x2
+ 247 0026 01       		.byte	0x1
+ 248 0027 06       		.byte	0x6
+ 249 0028 24030000 		.4byte	.LASF0
+ 250 002c 02       		.uleb128 0x2
+ 251 002d 01       		.byte	0x1
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 11
+
+
+ 252 002e 08       		.byte	0x8
+ 253 002f 97000000 		.4byte	.LASF1
+ 254 0033 02       		.uleb128 0x2
+ 255 0034 02       		.byte	0x2
+ 256 0035 05       		.byte	0x5
+ 257 0036 F0020000 		.4byte	.LASF2
+ 258 003a 02       		.uleb128 0x2
+ 259 003b 02       		.byte	0x2
+ 260 003c 07       		.byte	0x7
+ 261 003d 3D000000 		.4byte	.LASF3
+ 262 0041 02       		.uleb128 0x2
+ 263 0042 04       		.byte	0x4
+ 264 0043 05       		.byte	0x5
+ 265 0044 0A030000 		.4byte	.LASF4
+ 266 0048 02       		.uleb128 0x2
+ 267 0049 04       		.byte	0x4
+ 268 004a 07       		.byte	0x7
+ 269 004b AE000000 		.4byte	.LASF5
+ 270 004f 02       		.uleb128 0x2
+ 271 0050 08       		.byte	0x8
+ 272 0051 05       		.byte	0x5
+ 273 0052 99020000 		.4byte	.LASF6
+ 274 0056 02       		.uleb128 0x2
+ 275 0057 08       		.byte	0x8
+ 276 0058 07       		.byte	0x7
+ 277 0059 80000000 		.4byte	.LASF7
+ 278 005d 03       		.uleb128 0x3
+ 279 005e 04       		.byte	0x4
+ 280 005f 05       		.byte	0x5
+ 281 0060 696E7400 		.ascii	"int\000"
+ 282 0064 02       		.uleb128 0x2
+ 283 0065 04       		.byte	0x4
+ 284 0066 07       		.byte	0x7
+ 285 0067 1D020000 		.4byte	.LASF8
+ 286 006b 04       		.uleb128 0x4
+ 287 006c C0000000 		.4byte	.LASF9
+ 288 0070 02       		.byte	0x2
+ 289 0071 B3       		.byte	0xb3
+ 290 0072 2C000000 		.4byte	0x2c
+ 291 0076 04       		.uleb128 0x4
+ 292 0077 FA010000 		.4byte	.LASF10
+ 293 007b 02       		.byte	0x2
+ 294 007c B5       		.byte	0xb5
+ 295 007d 48000000 		.4byte	0x48
+ 296 0081 02       		.uleb128 0x2
+ 297 0082 04       		.byte	0x4
+ 298 0083 04       		.byte	0x4
+ 299 0084 7A000000 		.4byte	.LASF11
+ 300 0088 02       		.uleb128 0x2
+ 301 0089 08       		.byte	0x8
+ 302 008a 04       		.byte	0x4
+ 303 008b 08010000 		.4byte	.LASF12
+ 304 008f 02       		.uleb128 0x2
+ 305 0090 01       		.byte	0x1
+ 306 0091 08       		.byte	0x8
+ 307 0092 2A020000 		.4byte	.LASF13
+ 308 0096 02       		.uleb128 0x2
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 12
+
+
+ 309 0097 04       		.byte	0x4
+ 310 0098 07       		.byte	0x7
+ 311 0099 90020000 		.4byte	.LASF14
+ 312 009d 05       		.uleb128 0x5
+ 313 009e 01       		.byte	0x1
+ 314 009f 03       		.byte	0x3
+ 315 00a0 3302     		.2byte	0x233
+ 316 00a2 C6000000 		.4byte	0xc6
+ 317 00a6 06       		.uleb128 0x6
+ 318 00a7 30030000 		.4byte	.LASF15
+ 319 00ab 01       		.sleb128 1
+ 320 00ac 06       		.uleb128 0x6
+ 321 00ad 19000000 		.4byte	.LASF16
+ 322 00b1 02       		.sleb128 2
+ 323 00b2 06       		.uleb128 0x6
+ 324 00b3 2F020000 		.4byte	.LASF17
+ 325 00b7 03       		.sleb128 3
+ 326 00b8 06       		.uleb128 0x6
+ 327 00b9 F2000000 		.4byte	.LASF18
+ 328 00bd 04       		.sleb128 4
+ 329 00be 06       		.uleb128 0x6
+ 330 00bf C6000000 		.4byte	.LASF19
+ 331 00c3 FF01     		.sleb128 255
+ 332 00c5 00       		.byte	0
+ 333 00c6 07       		.uleb128 0x7
+ 334 00c7 FA020000 		.4byte	.LASF20
+ 335 00cb 03       		.byte	0x3
+ 336 00cc 4F02     		.2byte	0x24f
+ 337 00ce 9D000000 		.4byte	0x9d
+ 338 00d2 05       		.uleb128 0x5
+ 339 00d3 01       		.byte	0x1
+ 340 00d4 03       		.byte	0x3
+ 341 00d5 5302     		.2byte	0x253
+ 342 00d7 0D010000 		.4byte	0x10d
+ 343 00db 06       		.uleb128 0x6
+ 344 00dc 00000000 		.4byte	.LASF21
+ 345 00e0 01       		.sleb128 1
+ 346 00e1 06       		.uleb128 0x6
+ 347 00e2 45020000 		.4byte	.LASF22
+ 348 00e6 02       		.sleb128 2
+ 349 00e7 06       		.uleb128 0x6
+ 350 00e8 DA000000 		.4byte	.LASF23
+ 351 00ec 03       		.sleb128 3
+ 352 00ed 06       		.uleb128 0x6
+ 353 00ee 50000000 		.4byte	.LASF24
+ 354 00f2 04       		.sleb128 4
+ 355 00f3 06       		.uleb128 0x6
+ 356 00f4 D3020000 		.4byte	.LASF25
+ 357 00f8 05       		.sleb128 5
+ 358 00f9 06       		.uleb128 0x6
+ 359 00fa A7020000 		.4byte	.LASF26
+ 360 00fe 06       		.sleb128 6
+ 361 00ff 06       		.uleb128 0x6
+ 362 0100 01020000 		.4byte	.LASF27
+ 363 0104 07       		.sleb128 7
+ 364 0105 06       		.uleb128 0x6
+ 365 0106 76020000 		.4byte	.LASF28
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 13
+
+
+ 366 010a FF01     		.sleb128 255
+ 367 010c 00       		.byte	0
+ 368 010d 08       		.uleb128 0x8
+ 369 010e 69000000 		.4byte	.LASF37
+ 370 0112 01       		.byte	0x1
+ 371 0113 63       		.byte	0x63
+ 372 0114 00000000 		.4byte	.LFB35
+ 373 0118 3C000000 		.4byte	.LFE35-.LFB35
+ 374 011c 01       		.uleb128 0x1
+ 375 011d 9C       		.byte	0x9c
+ 376 011e 09       		.uleb128 0x9
+ 377 011f 0F010000 		.4byte	.LASF38
+ 378 0123 01       		.byte	0x1
+ 379 0124 9C       		.byte	0x9c
+ 380 0125 5D000000 		.4byte	0x5d
+ 381 0129 00000000 		.4byte	.LFB36
+ 382 012d EC000000 		.4byte	.LFE36-.LFB36
+ 383 0131 01       		.uleb128 0x1
+ 384 0132 9C       		.byte	0x9c
+ 385 0133 76010000 		.4byte	0x176
+ 386 0137 0A       		.uleb128 0xa
+ 387 0138 2B000000 		.4byte	.LASF29
+ 388 013c 01       		.byte	0x1
+ 389 013d 9E       		.byte	0x9e
+ 390 013e 76000000 		.4byte	0x76
+ 391 0142 05       		.uleb128 0x5
+ 392 0143 03       		.byte	0x3
+ 393 0144 04000000 		.4byte	previousTimestamp.6594
+ 394 0148 0A       		.uleb128 0xa
+ 395 0149 13030000 		.4byte	.LASF30
+ 396 014d 01       		.byte	0x1
+ 397 014e 9F       		.byte	0x9f
+ 398 014f 76000000 		.4byte	0x76
+ 399 0153 05       		.uleb128 0x5
+ 400 0154 03       		.byte	0x3
+ 401 0155 00000000 		.4byte	currentTimestamp.6595
+ 402 0159 0A       		.uleb128 0xa
+ 403 015a 49030000 		.4byte	.LASF31
+ 404 015e 01       		.byte	0x1
+ 405 015f A0       		.byte	0xa0
+ 406 0160 C6000000 		.4byte	0xc6
+ 407 0164 02       		.uleb128 0x2
+ 408 0165 91       		.byte	0x91
+ 409 0166 6F       		.sleb128 -17
+ 410 0167 0A       		.uleb128 0xa
+ 411 0168 C3020000 		.4byte	.LASF32
+ 412 016c 01       		.byte	0x1
+ 413 016d A1       		.byte	0xa1
+ 414 016e 6B000000 		.4byte	0x6b
+ 415 0172 02       		.uleb128 0x2
+ 416 0173 91       		.byte	0x91
+ 417 0174 6E       		.sleb128 -18
+ 418 0175 00       		.byte	0
+ 419 0176 0B       		.uleb128 0xb
+ 420 0177 63020000 		.4byte	.LASF39
+ 421 017b 04       		.byte	0x4
+ 422 017c 44       		.byte	0x44
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 14
+
+
+ 423 017d 81010000 		.4byte	0x181
+ 424 0181 02       		.uleb128 0x2
+ 425 0182 01       		.byte	0x1
+ 426 0183 02       		.byte	0x2
+ 427 0184 43030000 		.4byte	.LASF33
+ 428 0188 00       		.byte	0
+ 429              		.section	.debug_abbrev,"",%progbits
+ 430              	.Ldebug_abbrev0:
+ 431 0000 01       		.uleb128 0x1
+ 432 0001 11       		.uleb128 0x11
+ 433 0002 01       		.byte	0x1
+ 434 0003 25       		.uleb128 0x25
+ 435 0004 0E       		.uleb128 0xe
+ 436 0005 13       		.uleb128 0x13
+ 437 0006 0B       		.uleb128 0xb
+ 438 0007 03       		.uleb128 0x3
+ 439 0008 0E       		.uleb128 0xe
+ 440 0009 1B       		.uleb128 0x1b
+ 441 000a 0E       		.uleb128 0xe
+ 442 000b 55       		.uleb128 0x55
+ 443 000c 17       		.uleb128 0x17
+ 444 000d 11       		.uleb128 0x11
+ 445 000e 01       		.uleb128 0x1
+ 446 000f 10       		.uleb128 0x10
+ 447 0010 17       		.uleb128 0x17
+ 448 0011 00       		.byte	0
+ 449 0012 00       		.byte	0
+ 450 0013 02       		.uleb128 0x2
+ 451 0014 24       		.uleb128 0x24
+ 452 0015 00       		.byte	0
+ 453 0016 0B       		.uleb128 0xb
+ 454 0017 0B       		.uleb128 0xb
+ 455 0018 3E       		.uleb128 0x3e
+ 456 0019 0B       		.uleb128 0xb
+ 457 001a 03       		.uleb128 0x3
+ 458 001b 0E       		.uleb128 0xe
+ 459 001c 00       		.byte	0
+ 460 001d 00       		.byte	0
+ 461 001e 03       		.uleb128 0x3
+ 462 001f 24       		.uleb128 0x24
+ 463 0020 00       		.byte	0
+ 464 0021 0B       		.uleb128 0xb
+ 465 0022 0B       		.uleb128 0xb
+ 466 0023 3E       		.uleb128 0x3e
+ 467 0024 0B       		.uleb128 0xb
+ 468 0025 03       		.uleb128 0x3
+ 469 0026 08       		.uleb128 0x8
+ 470 0027 00       		.byte	0
+ 471 0028 00       		.byte	0
+ 472 0029 04       		.uleb128 0x4
+ 473 002a 16       		.uleb128 0x16
+ 474 002b 00       		.byte	0
+ 475 002c 03       		.uleb128 0x3
+ 476 002d 0E       		.uleb128 0xe
+ 477 002e 3A       		.uleb128 0x3a
+ 478 002f 0B       		.uleb128 0xb
+ 479 0030 3B       		.uleb128 0x3b
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 15
+
+
+ 480 0031 0B       		.uleb128 0xb
+ 481 0032 49       		.uleb128 0x49
+ 482 0033 13       		.uleb128 0x13
+ 483 0034 00       		.byte	0
+ 484 0035 00       		.byte	0
+ 485 0036 05       		.uleb128 0x5
+ 486 0037 04       		.uleb128 0x4
+ 487 0038 01       		.byte	0x1
+ 488 0039 0B       		.uleb128 0xb
+ 489 003a 0B       		.uleb128 0xb
+ 490 003b 3A       		.uleb128 0x3a
+ 491 003c 0B       		.uleb128 0xb
+ 492 003d 3B       		.uleb128 0x3b
+ 493 003e 05       		.uleb128 0x5
+ 494 003f 01       		.uleb128 0x1
+ 495 0040 13       		.uleb128 0x13
+ 496 0041 00       		.byte	0
+ 497 0042 00       		.byte	0
+ 498 0043 06       		.uleb128 0x6
+ 499 0044 28       		.uleb128 0x28
+ 500 0045 00       		.byte	0
+ 501 0046 03       		.uleb128 0x3
+ 502 0047 0E       		.uleb128 0xe
+ 503 0048 1C       		.uleb128 0x1c
+ 504 0049 0D       		.uleb128 0xd
+ 505 004a 00       		.byte	0
+ 506 004b 00       		.byte	0
+ 507 004c 07       		.uleb128 0x7
+ 508 004d 16       		.uleb128 0x16
+ 509 004e 00       		.byte	0
+ 510 004f 03       		.uleb128 0x3
+ 511 0050 0E       		.uleb128 0xe
+ 512 0051 3A       		.uleb128 0x3a
+ 513 0052 0B       		.uleb128 0xb
+ 514 0053 3B       		.uleb128 0x3b
+ 515 0054 05       		.uleb128 0x5
+ 516 0055 49       		.uleb128 0x49
+ 517 0056 13       		.uleb128 0x13
+ 518 0057 00       		.byte	0
+ 519 0058 00       		.byte	0
+ 520 0059 08       		.uleb128 0x8
+ 521 005a 2E       		.uleb128 0x2e
+ 522 005b 00       		.byte	0
+ 523 005c 03       		.uleb128 0x3
+ 524 005d 0E       		.uleb128 0xe
+ 525 005e 3A       		.uleb128 0x3a
+ 526 005f 0B       		.uleb128 0xb
+ 527 0060 3B       		.uleb128 0x3b
+ 528 0061 0B       		.uleb128 0xb
+ 529 0062 27       		.uleb128 0x27
+ 530 0063 19       		.uleb128 0x19
+ 531 0064 11       		.uleb128 0x11
+ 532 0065 01       		.uleb128 0x1
+ 533 0066 12       		.uleb128 0x12
+ 534 0067 06       		.uleb128 0x6
+ 535 0068 40       		.uleb128 0x40
+ 536 0069 18       		.uleb128 0x18
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 16
+
+
+ 537 006a 9642     		.uleb128 0x2116
+ 538 006c 19       		.uleb128 0x19
+ 539 006d 00       		.byte	0
+ 540 006e 00       		.byte	0
+ 541 006f 09       		.uleb128 0x9
+ 542 0070 2E       		.uleb128 0x2e
+ 543 0071 01       		.byte	0x1
+ 544 0072 3F       		.uleb128 0x3f
+ 545 0073 19       		.uleb128 0x19
+ 546 0074 03       		.uleb128 0x3
+ 547 0075 0E       		.uleb128 0xe
+ 548 0076 3A       		.uleb128 0x3a
+ 549 0077 0B       		.uleb128 0xb
+ 550 0078 3B       		.uleb128 0x3b
+ 551 0079 0B       		.uleb128 0xb
+ 552 007a 49       		.uleb128 0x49
+ 553 007b 13       		.uleb128 0x13
+ 554 007c 11       		.uleb128 0x11
+ 555 007d 01       		.uleb128 0x1
+ 556 007e 12       		.uleb128 0x12
+ 557 007f 06       		.uleb128 0x6
+ 558 0080 40       		.uleb128 0x40
+ 559 0081 18       		.uleb128 0x18
+ 560 0082 9642     		.uleb128 0x2116
+ 561 0084 19       		.uleb128 0x19
+ 562 0085 01       		.uleb128 0x1
+ 563 0086 13       		.uleb128 0x13
+ 564 0087 00       		.byte	0
+ 565 0088 00       		.byte	0
+ 566 0089 0A       		.uleb128 0xa
+ 567 008a 34       		.uleb128 0x34
+ 568 008b 00       		.byte	0
+ 569 008c 03       		.uleb128 0x3
+ 570 008d 0E       		.uleb128 0xe
+ 571 008e 3A       		.uleb128 0x3a
+ 572 008f 0B       		.uleb128 0xb
+ 573 0090 3B       		.uleb128 0x3b
+ 574 0091 0B       		.uleb128 0xb
+ 575 0092 49       		.uleb128 0x49
+ 576 0093 13       		.uleb128 0x13
+ 577 0094 02       		.uleb128 0x2
+ 578 0095 18       		.uleb128 0x18
+ 579 0096 00       		.byte	0
+ 580 0097 00       		.byte	0
+ 581 0098 0B       		.uleb128 0xb
+ 582 0099 34       		.uleb128 0x34
+ 583 009a 00       		.byte	0
+ 584 009b 03       		.uleb128 0x3
+ 585 009c 0E       		.uleb128 0xe
+ 586 009d 3A       		.uleb128 0x3a
+ 587 009e 0B       		.uleb128 0xb
+ 588 009f 3B       		.uleb128 0x3b
+ 589 00a0 0B       		.uleb128 0xb
+ 590 00a1 49       		.uleb128 0x49
+ 591 00a2 13       		.uleb128 0x13
+ 592 00a3 3F       		.uleb128 0x3f
+ 593 00a4 19       		.uleb128 0x19
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 17
+
+
+ 594 00a5 3C       		.uleb128 0x3c
+ 595 00a6 19       		.uleb128 0x19
+ 596 00a7 00       		.byte	0
+ 597 00a8 00       		.byte	0
+ 598 00a9 00       		.byte	0
+ 599              		.section	.debug_aranges,"",%progbits
+ 600 0000 24000000 		.4byte	0x24
+ 601 0004 0200     		.2byte	0x2
+ 602 0006 00000000 		.4byte	.Ldebug_info0
+ 603 000a 04       		.byte	0x4
+ 604 000b 00       		.byte	0
+ 605 000c 0000     		.2byte	0
+ 606 000e 0000     		.2byte	0
+ 607 0010 00000000 		.4byte	.LFB35
+ 608 0014 3C000000 		.4byte	.LFE35-.LFB35
+ 609 0018 00000000 		.4byte	.LFB36
+ 610 001c EC000000 		.4byte	.LFE36-.LFB36
+ 611 0020 00000000 		.4byte	0
+ 612 0024 00000000 		.4byte	0
+ 613              		.section	.debug_ranges,"",%progbits
+ 614              	.Ldebug_ranges0:
+ 615 0000 00000000 		.4byte	.LFB35
+ 616 0004 3C000000 		.4byte	.LFE35
+ 617 0008 00000000 		.4byte	.LFB36
+ 618 000c EC000000 		.4byte	.LFE36
+ 619 0010 00000000 		.4byte	0
+ 620 0014 00000000 		.4byte	0
+ 621              		.section	.debug_line,"",%progbits
+ 622              	.Ldebug_line0:
+ 623 0000 CD000000 		.section	.debug_str,"MS",%progbits,1
+ 623      02006700 
+ 623      00000201 
+ 623      FB0E0D00 
+ 623      01010101 
+ 624              	.LASF21:
+ 625 0000 4359424C 		.ascii	"CYBLE_BLESS_STATE_ACTIVE\000"
+ 625      455F424C 
+ 625      4553535F 
+ 625      53544154 
+ 625      455F4143 
+ 626              	.LASF16:
+ 627 0019 4359424C 		.ascii	"CYBLE_BLESS_SLEEP\000"
+ 627      455F424C 
+ 627      4553535F 
+ 627      534C4545 
+ 627      5000
+ 628              	.LASF29:
+ 629 002b 70726576 		.ascii	"previousTimestamp\000"
+ 629      696F7573 
+ 629      54696D65 
+ 629      7374616D 
+ 629      7000
+ 630              	.LASF3:
+ 631 003d 73686F72 		.ascii	"short unsigned int\000"
+ 631      7420756E 
+ 631      7369676E 
+ 631      65642069 
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 18
+
+
+ 631      6E7400
+ 632              	.LASF24:
+ 633 0050 4359424C 		.ascii	"CYBLE_BLESS_STATE_ECO_ON\000"
+ 633      455F424C 
+ 633      4553535F 
+ 633      53544154 
+ 633      455F4543 
+ 634              	.LASF37:
+ 635 0069 496E6974 		.ascii	"InitializeSystem\000"
+ 635      69616C69 
+ 635      7A655379 
+ 635      7374656D 
+ 635      00
+ 636              	.LASF11:
+ 637 007a 666C6F61 		.ascii	"float\000"
+ 637      7400
+ 638              	.LASF7:
+ 639 0080 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 639      206C6F6E 
+ 639      6720756E 
+ 639      7369676E 
+ 639      65642069 
+ 640              	.LASF1:
+ 641 0097 756E7369 		.ascii	"unsigned char\000"
+ 641      676E6564 
+ 641      20636861 
+ 641      7200
+ 642              	.LASF35:
+ 643 00a5 2E5C6D61 		.ascii	".\\main.c\000"
+ 643      696E2E63 
+ 643      00
+ 644              	.LASF5:
+ 645 00ae 6C6F6E67 		.ascii	"long unsigned int\000"
+ 645      20756E73 
+ 645      69676E65 
+ 645      6420696E 
+ 645      7400
+ 646              	.LASF9:
+ 647 00c0 75696E74 		.ascii	"uint8\000"
+ 647      3800
+ 648              	.LASF19:
+ 649 00c6 4359424C 		.ascii	"CYBLE_BLESS_INVALID\000"
+ 649      455F424C 
+ 649      4553535F 
+ 649      494E5641 
+ 649      4C494400 
+ 650              	.LASF23:
+ 651 00da 4359424C 		.ascii	"CYBLE_BLESS_STATE_SLEEP\000"
+ 651      455F424C 
+ 651      4553535F 
+ 651      53544154 
+ 651      455F534C 
+ 652              	.LASF18:
+ 653 00f2 4359424C 		.ascii	"CYBLE_BLESS_HIBERNATE\000"
+ 653      455F424C 
+ 653      4553535F 
+ 653      48494245 
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 19
+
+
+ 653      524E4154 
+ 654              	.LASF12:
+ 655 0108 646F7562 		.ascii	"double\000"
+ 655      6C6500
+ 656              	.LASF38:
+ 657 010f 6D61696E 		.ascii	"main\000"
+ 657      00
+ 658              	.LASF36:
+ 659 0114 483A5C44 		.ascii	"H:\\Dropdox\\Dropbox\\PSoC_CY8CKIT042\\LabHA_BLE\\L"
+ 659      726F7064 
+ 659      6F785C44 
+ 659      726F7062 
+ 659      6F785C50 
+ 660 0142 61623348 		.ascii	"ab3HA\\BLE Lab 3\\BLE Lab 3 HeartRate.cydsn\000"
+ 660      415C424C 
+ 660      45204C61 
+ 660      6220335C 
+ 660      424C4520 
+ 661              	.LASF34:
+ 662 016c 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 662      4320342E 
+ 662      392E3320 
+ 662      32303135 
+ 662      30333033 
+ 663 019f 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m0 -mthumb -g -O"
+ 663      20726576 
+ 663      6973696F 
+ 663      6E203232 
+ 663      31323230 
+ 664 01d2 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 664      66756E63 
+ 664      74696F6E 
+ 664      2D736563 
+ 664      74696F6E 
+ 665              	.LASF10:
+ 666 01fa 75696E74 		.ascii	"uint32\000"
+ 666      333200
+ 667              	.LASF27:
+ 668 0201 4359424C 		.ascii	"CYBLE_BLESS_STATE_HIBERNATE\000"
+ 668      455F424C 
+ 668      4553535F 
+ 668      53544154 
+ 668      455F4849 
+ 669              	.LASF8:
+ 670 021d 756E7369 		.ascii	"unsigned int\000"
+ 670      676E6564 
+ 670      20696E74 
+ 670      00
+ 671              	.LASF13:
+ 672 022a 63686172 		.ascii	"char\000"
+ 672      00
+ 673              	.LASF17:
+ 674 022f 4359424C 		.ascii	"CYBLE_BLESS_DEEPSLEEP\000"
+ 674      455F424C 
+ 674      4553535F 
+ 674      44454550 
+ 674      534C4545 
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 20
+
+
+ 675              	.LASF22:
+ 676 0245 4359424C 		.ascii	"CYBLE_BLESS_STATE_EVENT_CLOSE\000"
+ 676      455F424C 
+ 676      4553535F 
+ 676      53544154 
+ 676      455F4556 
+ 677              	.LASF39:
+ 678 0263 656E7465 		.ascii	"enterHibernateFlag\000"
+ 678      72486962 
+ 678      65726E61 
+ 678      7465466C 
+ 678      616700
+ 679              	.LASF28:
+ 680 0276 4359424C 		.ascii	"CYBLE_BLESS_STATE_INVALID\000"
+ 680      455F424C 
+ 680      4553535F 
+ 680      53544154 
+ 680      455F494E 
+ 681              	.LASF14:
+ 682 0290 73697A65 		.ascii	"sizetype\000"
+ 682      74797065 
+ 682      00
+ 683              	.LASF6:
+ 684 0299 6C6F6E67 		.ascii	"long long int\000"
+ 684      206C6F6E 
+ 684      6720696E 
+ 684      7400
+ 685              	.LASF26:
+ 686 02a7 4359424C 		.ascii	"CYBLE_BLESS_STATE_DEEPSLEEP\000"
+ 686      455F424C 
+ 686      4553535F 
+ 686      53544154 
+ 686      455F4445 
+ 687              	.LASF32:
+ 688 02c3 696E7465 		.ascii	"interruptStatus\000"
+ 688      72727570 
+ 688      74537461 
+ 688      74757300 
+ 689              	.LASF25:
+ 690 02d3 4359424C 		.ascii	"CYBLE_BLESS_STATE_ECO_STABLE\000"
+ 690      455F424C 
+ 690      4553535F 
+ 690      53544154 
+ 690      455F4543 
+ 691              	.LASF2:
+ 692 02f0 73686F72 		.ascii	"short int\000"
+ 692      7420696E 
+ 692      7400
+ 693              	.LASF20:
+ 694 02fa 4359424C 		.ascii	"CYBLE_LP_MODE_T\000"
+ 694      455F4C50 
+ 694      5F4D4F44 
+ 694      455F5400 
+ 695              	.LASF4:
+ 696 030a 6C6F6E67 		.ascii	"long int\000"
+ 696      20696E74 
+ 696      00
+ARM GAS  Z:\Users\Harris.He\AppData\Local\Temp\cctTV8DS.s 			page 21
+
+
+ 697              	.LASF30:
+ 698 0313 63757272 		.ascii	"currentTimestamp\000"
+ 698      656E7454 
+ 698      696D6573 
+ 698      74616D70 
+ 698      00
+ 699              	.LASF0:
+ 700 0324 7369676E 		.ascii	"signed char\000"
+ 700      65642063 
+ 700      68617200 
+ 701              	.LASF15:
+ 702 0330 4359424C 		.ascii	"CYBLE_BLESS_ACTIVE\000"
+ 702      455F424C 
+ 702      4553535F 
+ 702      41435449 
+ 702      564500
+ 703              	.LASF33:
+ 704 0343 5F426F6F 		.ascii	"_Bool\000"
+ 704      6C00
+ 705              	.LASF31:
+ 706 0349 626C654D 		.ascii	"bleMode\000"
+ 706      6F646500 
+ 707              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br
